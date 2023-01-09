@@ -1,0 +1,128 @@
+--Task 3
+
+--1
+SELECT * FROM customer ORDER BY city;
+
+--2
+ALTER TABLE product RENAME COLUMN name1 TO prod_name;
+ALTER TABLE product RENAME COLUMN color TO prod_color;
+ALTER TABLE product RENAME COLUMN sellorname TO prod_sellername;
+ALTER TABLE product RENAME COLUMN Sizesav TO prod_Sizes_av;
+ALTER TABLE product RENAME COLUMN quantityav TO prod_quantityav;
+ALTER TABLE product RENAME COLUMN cost TO prod_cost;
+ALTER TABLE product RENAME COLUMN discount TO prod_discount;
+ALTER TABLE product RENAME COLUMN pstatus TO prod_pstatus;
+ALTER TABLE product RENAME COLUMN categories TO prod_categories;
+ALTER TABLE product RENAME COLUMN brands TO prod_brands;
+ALTER TABLE product RENAME COLUMN images TO prod_images;
+ALTER TABLE product RENAME COLUMN questions TO prod_questions;
+ALTER TABLE product RENAME COLUMN cust_id TO prod_cust_id;
+ALTER TABLE product RENAME COLUMN order_id TO prod_order_id;
+
+--3
+SELECT c.name1,c.gender,c.DOB,c.email,c.currentorders FROM customer c INNER JOIN product p ON c.`cust_id`=p.`prod_cust_id`;
+--4
+SELECT c.name1,c.gender,c.DOB,c.email,c.currentorders FROM customer c JOIN product p ON c.`cust_id`=p.`prod_cust_id`
+WHERE c.`name1`='A%A' ;
+
+--5
+SELECT c.name1,c.gender,c.DOB,c.email,c.previousorders FROM customer c INNER JOIN ordershipmentinvoices o ON c.`cust_id`=o.`cust_id` 
+WHERE o.totalRupee>10000 AND COUNT(c.cust_id)>1;
+
+--6
+USE e_commerce;
+DELIMITER $$
+CREATE PROCEDURE `e_commerce`.run()
+BEGIN
+
+CREATE TABLE customer(
+cust_id INT PRIMARY KEY,
+name1 VARCHAR(255),
+gender CHAR(1),
+DOB DATE,
+city VARCHAR(255),
+pwd VARCHAR(255),
+email VARCHAR(255),
+DeliveryAddress VARCHAR(255),
+contacts VARCHAR(255),
+currentorders VARCHAR(255),
+previousorders VARCHAR(255),
+paymentdetails VARCHAR(255),
+sell_id INT REFERENCES seller(sell_id)
+);
+
+CREATE TABLE seller(
+Sell_id INT PRIMARY KEY,
+Sell_name VARCHAR(255),
+mobileno INT,
+password1 VARCHAR(255),
+date_of_productdelivery VARCHAR(255)
+);
+
+CREATE TABLE Coupon_code(
+c_id INT PRIMARY KEY,
+percentage_discount INT,
+prod_id INT REFERENCES product(prod_id) 
+);
+
+CREATE TABLE orders(
+order_id INT PRIMARY KEY,
+o_status VARCHAR(255),
+Deliveydate DATE,
+cust_id INT  REFERENCES customer(cust_id) 
+);
+
+CREATE TABLE product(
+prod_id INT PRIMARY KEY,
+name1 VARCHAR(255),
+color VARCHAR(255),
+sellorname VARCHAR(255),
+Sizesav VARCHAR(255),
+quantityav INT,
+cost INT,
+discount INT,
+pstatus VARCHAR(255),
+rating INT,
+isonsale CHAR(1),
+categories VARCHAR(255),
+brands VARCHAR(255),
+images VARCHAR(255),
+questions VARCHAR(255),
+cust_id INT REFERENCES customer(cust_id),
+order_id INT REFERENCES orders(order_id)
+);
+
+CREATE TABLE review(
+rev_id INT PRIMARY KEY,
+rating VARCHAR(255),
+cust_id INT REFERENCES customer(cust_id)
+ );
+
+CREATE TABLE replacement (
+rep_id INT PRIMARY KEY,
+productname VARCHAR(255),
+o_status VARCHAR(255)
+);
+
+CREATE TABLE Wishlist(
+wish_id INT PRIMARY KEY,
+productname VARCHAR(255),
+product_price INT,
+prod_id_wish INT REFERENCES product(prod_id),
+cust_id INT REFERENCES customer(cust_id)
+);
+
+CREATE TABLE ordershipmentinvoices(
+invoice_id INT PRIMARY KEY,
+productname VARCHAR(255),
+GST INT,
+totalRupee INT,
+modeofpayament VARCHAR(255),
+prod_id INT REFERENCES product(prod_id),
+cust_id INT REFERENCES customer(cust_id)
+);
+
+END$$
+DELIMITER;
+
+CALL run;
